@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: myblog-gateway
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: myblog
+spec:
+  hosts: 
+  - fakeblog.com
+  gateways:
+  - myblog-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /myblog
+    rewrite: 
+      uri: /    # rewrite the URI path to route to the root of the my-blog service
+    route:
+    - destination:
+        port:
+          number: 80
+        host: myblog
